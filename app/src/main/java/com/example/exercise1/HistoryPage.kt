@@ -8,13 +8,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,15 +29,33 @@ import androidx.room.Index
 @Composable
 fun Historypage(viewModel: OrderViewModel, navController: NavController ){
     val order by viewModel.drinks.collectAsState(initial = emptyList())
+
+    var showDeleteDialog by remember { mutableStateOf(false ) }
     LazyColumn {
         items(order){ orders ->
             Row() {
+                if(showDeleteDialog){
+                    AlertDialog(
+                        onDismissRequest = {showDeleteDialog = false},
+                        title = { Text("ยืนยันการลบ")},
+                        text = { Text("แน่ใจว่าต้องการลบรายการนี้")},
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    viewModel.deleteDrink(orders)
+                                    showDeleteDialog = false
+                                }
+                            ) { Text("ลบ") }
+                        }
+                    )
+                }
+
                 Text("Size: ${orders.size}, Qty: ${orders.num}, Note: ${orders.note}")
                 IconButton(onClick = {navController.navigate("edit/${orders.id}")}) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = null)
                 }
                 IconButton(onClick = {
-                    viewModel.deleteDrink(orders)
+                    showDeleteDialog = true
                 }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                 }
