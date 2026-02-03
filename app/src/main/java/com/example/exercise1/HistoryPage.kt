@@ -31,7 +31,9 @@ fun Historypage(viewModel: OrderViewModel, navController: NavController ){
                 IconButton(onClick = {navController.navigate("edit/${orders.id}")}) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = null)
                 }
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    viewModel.deleteDrink(orders)
+                }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                 }
             }

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
@@ -40,6 +41,9 @@ interface OrderDao{
 
     @Update
     suspend fun update(order: OrderEntity)
+
+    @Delete
+    suspend fun delete(order: OrderEntity)
 }
 
 @Database(
@@ -80,6 +84,10 @@ class OrderRepository(private val dao: OrderDao){
     suspend fun update(order: OrderEntity){
         dao.update(order)
     }
+
+    suspend fun delete(order: OrderEntity){
+        dao.delete(order)
+    }
 }
 
 class SharedViewModel : ViewModel() {
@@ -119,6 +127,11 @@ class OrderViewModel(
                 num = num,
                 note = note
             ))
+        }
+    }
+    fun deleteDrink(order: OrderEntity){
+        viewModelScope.launch {
+            repository.delete(order)
         }
     }
 }
