@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -128,21 +130,24 @@ fun EditScreen(drinkID:Int,
         }
         Spacer(modifier = Modifier.height(32.dp))
 
-        Box(
-            modifier = Modifier.clickable {
-                sharedViewModel.setOrder(
+        Button(onClick = {
+            drinkID?.let{
+                viewModel.updateDrink(
+                    id = drinkID,
                     size = selectedOption,
                     num = quantity,
                     note = detailbox
                 )
-                navController.navigate("confirm")
             }
-                .background(Color(0xff5DD3B6))
-                .padding(15.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            navController.navigate("history")
+        },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF5DD3B6),
+                contentColor = Color.White
+            )
         ) {
-            Text(text = "แก้ไขข้อมูล", color = Color.White)
+            Text("แก้ไขข้อมูล")
         }
     }
 }

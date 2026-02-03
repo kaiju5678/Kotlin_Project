@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = "history"
                         ) {
-                            Historypage(orderviewModel)
+                            Historypage(orderviewModel, navController = navController)
                         }
                         composable("edit/{id}", arguments = listOf(navArgument("id"){
                             type = NavType.IntType

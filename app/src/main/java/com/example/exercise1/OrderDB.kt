@@ -15,6 +15,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -34,8 +35,11 @@ interface OrderDao{
     @Query("SELECT * FROM `orders`")
     fun getAll(): Flow<List<OrderEntity>>
 
-    @Query("SELECT * FROM `orders` WHERE id = id")
+    @Query("SELECT * FROM `orders` WHERE id = :id")
     fun getById(id: Int): Flow<OrderEntity?>
+
+    @Update
+    suspend fun update(order: OrderEntity)
 }
 
 @Database(
@@ -72,6 +76,10 @@ class OrderRepository(private val dao: OrderDao){
     fun getOrderID(id: Int): Flow<OrderEntity?>{
         return dao.getById(id)
     }
+
+    suspend fun update(order: OrderEntity){
+        dao.update(order)
+    }
 }
 
 class SharedViewModel : ViewModel() {
@@ -101,6 +109,17 @@ class OrderViewModel(
 
     fun getDrinkID(id: Int): Flow<OrderEntity?>{
         return repository.getOrderID(id)
+    }
+
+    fun updateDrink(id:Int, size: String, num:Int, note:String?){
+        viewModelScope.launch {
+            repository.update(OrderEntity(
+                id = id,
+                size = size,
+                num = num,
+                note = note
+            ))
+        }
     }
 }
 
