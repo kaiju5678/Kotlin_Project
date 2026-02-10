@@ -35,6 +35,9 @@ interface ApiService{
     suspend fun getProductbyID(
         @Path("id")id: Int
     ): retrofit2.Response<Products>
+
+    @GET("products")
+    suspend fun getAllProducts(): retrofit2.Response<List<Products>>
 }
 
 object RetrofitInstance{
@@ -72,15 +75,38 @@ class ProductRepository{
             Resource.Error(e.message)
         }
     }
-}
+
+    suspend fun fetchAllProducts(): Resource<List<Products>>{
+        return try{
+            val response = RetrofitInstance.api.getAllProducts()
+            if (response.isSuccessful){
+                response.body()?.let {
+                    Resource.Success(it)
+                } ?: Resource.Error("Empty body")
+            } else{
+                Resource.Error("Error ${response.code()}")
+            }
+        } catch (e: Exception){
+            Resource.Error(e.message)
+        }
+    }
+    }
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel(){
     private val _product = MutableLiveData<Resource<Products>>()
+    private val _allProduct = MutableLiveData<Resource<List<Products>>>()
     val product: LiveData<Resource<Products>> = _product
+    val allProduct: LiveData<Resource<List<Products>>> = _allProduct
     fun loadProduct(id: Int){
         _product.value = Resource.Loading()
         viewModelScope.launch {
             _product.value = repository.fetchproductByID(id)
+        }
+    }
+    fun loadAllProduct(){
+        _allProduct.value = Resource.Loading()
+        viewModelScope.launch {
+            _allProduct.value = repository.fetchAllProducts()
         }
     }
 }

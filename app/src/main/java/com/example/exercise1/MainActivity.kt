@@ -179,7 +179,7 @@ class MainActivity : ComponentActivity() {
                                 )
                         }
                         composable("product"){
-                            ProductScreen(1)
+                            AllProductsScreen()
                         }
                     }
                 }
