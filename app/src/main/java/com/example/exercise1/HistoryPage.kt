@@ -30,38 +30,39 @@ import androidx.room.Index
 fun Historypage(viewModel: OrderViewModel, navController: NavController ){
     val order by viewModel.drinks.collectAsState(initial = emptyList())
 
-    var showDeleteDialog by remember { mutableStateOf(false ) }
+    var deleteOrder by remember { mutableStateOf<OrderEntity?>(null) }
     LazyColumn {
         items(order){ orders ->
             Row() {
-                if(showDeleteDialog){
-                    AlertDialog(
-                        onDismissRequest = {showDeleteDialog = false},
-                        title = { Text("ยืนยันการลบ")},
-                        text = { Text("แน่ใจว่าต้องการลบรายการนี้")},
-                        confirmButton = {
-                            TextButton(
-                                onClick = {
-                                    viewModel.deleteDrink(orders)
-                                    showDeleteDialog = false
-                                }
-                            ) { Text("ลบ") }
-                        }
-                    )
-                }
+
 
                 Text("Size: ${orders.size}, Qty: ${orders.num}, Note: ${orders.note}")
                 IconButton(onClick = {navController.navigate("edit/${orders.id}")}) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = null)
                 }
                 IconButton(onClick = {
-                    showDeleteDialog = true
+                    deleteOrder = orders
                 }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                 }
             }
 
 
+            deleteOrder?.let { orders ->
+                AlertDialog(
+                    onDismissRequest = {deleteOrder = null},
+                    title = { Text("ยืนยันการลบ")},
+                    text = { Text("แน่ใจว่าต้องการลบรายการนี้")},
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.deleteDrink(orders)
+                                deleteOrder = null
+                            }
+                        ) { Text("ลบ") }
+                    }
+                )
+            }
 
 
 //            Card(modifier = Modifier
