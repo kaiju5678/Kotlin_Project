@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +47,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -150,7 +153,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        startDestination = "home"
+                        startDestination = "product"
                     ) {
                         composable("home") {
                             MilkteaShop(navController = navController, sharedViewModel)
@@ -174,6 +177,9 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 sharedViewModel = sharedViewModel
                                 )
+                        }
+                        composable("product"){
+                            ProductScreen(1)
                         }
                     }
                 }

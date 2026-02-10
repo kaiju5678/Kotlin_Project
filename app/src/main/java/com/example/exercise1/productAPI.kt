@@ -1,6 +1,13 @@
 package com.example.exercise1
 
-import android.media.Rating
+import android.view.View
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import okhttp3.Response
 import org.intellij.lang.annotations.Pattern
 import retrofit2.Retrofit
@@ -15,7 +22,7 @@ data class Products(
     val description: String,
     val category: String,
     val image: String,
-    val  rating: Rating
+    val rating: Rating
 )
 
 data class Rating(
@@ -64,5 +71,25 @@ class ProductRepository{
         } catch (e: Exception){
             Resource.Error(e.message)
         }
+    }
+}
+
+class ProductViewModel(private val repository: ProductRepository) : ViewModel(){
+    private val _product = MutableLiveData<Resource<Products>>()
+    val product: LiveData<Resource<Products>> = _product
+    fun loadProduct(id: Int){
+        _product.value = Resource.Loading()
+        viewModelScope.launch {
+            _product.value = repository.fetchproductByID(id)
+        }
+    }
+}
+
+class ProductViewModelFactory(private val repository: ProductRepository) : ViewModelProvider.Factory{
+    override  fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ProductViewModel::class.java)){
+            return ProductViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
