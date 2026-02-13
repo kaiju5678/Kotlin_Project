@@ -153,7 +153,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        startDestination = "product"
+                        startDestination = "team"
                     ) {
                         composable("home") {
                             MilkteaShop(navController = navController, sharedViewModel)
@@ -180,6 +180,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("product"){
                             AllProductsScreen()
+                        }
+                        composable("team") {
+                            TeamScreen()
                         }
                     }
                 }
