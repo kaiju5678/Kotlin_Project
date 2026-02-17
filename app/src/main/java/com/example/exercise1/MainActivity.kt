@@ -1,13 +1,11 @@
 package com.example.exercise1
 
-import android.R.attr.text
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,21 +17,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.DoNotDisturbOn
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,9 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,9 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -70,8 +55,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.exercise1.api_screen.AllProductsScreen
+import com.example.exercise1.api_screen.TeamScreen
+import com.example.exercise1.history.EditScreen
+import com.example.exercise1.history.Historypage
+import com.example.exercise1.order.OrderDetail
+import com.example.exercise1.order.OrderViewModel
+import com.example.exercise1.order.OrderViewModelFactory
+import com.example.exercise1.order.SharedViewModel
 import com.example.exercise1.ui.theme.Exercise1Theme
-import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -82,7 +74,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Exercise1Theme {
                 val context = LocalContext.current
-                val orderviewModel: OrderViewModel = viewModel (
+                val orderviewModel: OrderViewModel = viewModel(
                     factory = OrderViewModelFactory(context)
                 )
                 val sharedViewModel: SharedViewModel = viewModel()
@@ -132,9 +124,10 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         selecteditem = index
                                         when (index) {
-                                            0 -> navController.navigate("home"){
+                                            0 -> navController.navigate("home") {
                                                 popUpTo("home") { inclusive = true }
                                             }
+
                                             1 -> navController.navigate("history")
                                         }
                                     },
@@ -153,36 +146,50 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding),
-                        startDestination = "team"
+                        startDestination = "new_shop"
                     ) {
                         composable("home") {
                             MilkteaShop(navController = navController, sharedViewModel)
                         }
                         composable(
                             route = "confirm"
-                        ) { OrderDetail(sharedViewModel = sharedViewModel, navController = navController, orderViewModel = orderviewModel)
+                        ) {
+                            OrderDetail(
+                                sharedViewModel = sharedViewModel,
+                                navController = navController,
+                                orderViewModel = orderviewModel
+                            )
                         }
                         composable(
                             route = "history"
                         ) {
                             Historypage(orderviewModel, navController = navController)
                         }
-                        composable("edit/{id}", arguments = listOf(navArgument("id"){
+                        composable("edit/{id}", arguments = listOf(navArgument("id") {
                             type = NavType.IntType
-                        })) {
-                            backStackEntry -> val id = backStackEntry.arguments?.getInt("id") ?: 0
+                        })) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("id") ?: 0
                             EditScreen(
                                 drinkID = id,
                                 viewModel = orderviewModel,
                                 navController = navController,
                                 sharedViewModel = sharedViewModel
-                                )
+                            )
                         }
-                        composable("product"){
+                        composable("product") {
                             AllProductsScreen()
                         }
                         composable("team") {
                             TeamScreen()
+                        }
+                        // 1. เพิ่ม Route สำหรับหน้าเลือกซื้อสินค้า (อันใหม่ที่เราเพิ่งสร้าง)
+                        composable("new_shop") {
+                            com.example.exercise1.cart.NewShoppingScreen(navController)
+                        }
+
+                        // 2. เพิ่ม Route สำหรับหน้าตะกร้า
+                        composable("my_cart_page") {
+                            com.example.exercise1.cart.MyCartPage(navController)
                         }
                     }
                 }
@@ -271,14 +278,15 @@ fun MilkteaShop(navController: NavController, sharedViewModel: SharedViewModel) 
         Spacer(modifier = Modifier.height(32.dp))
 
         Box(
-            modifier = Modifier.clickable {
-                sharedViewModel.setOrder(
-                    size = selectedOption,
-                    num = quantity,
-                    note = detailbox
-                )
-                navController.navigate("confirm")
-            }
+            modifier = Modifier
+                .clickable {
+                    sharedViewModel.setOrder(
+                        size = selectedOption,
+                        num = quantity,
+                        note = detailbox
+                    )
+                    navController.navigate("confirm")
+                }
                 .background(Color(0xff5DD3B6))
                 .padding(15.dp)
                 .fillMaxWidth(),

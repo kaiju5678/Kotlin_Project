@@ -1,15 +1,11 @@
-package com.example.exercise1
+package com.example.exercise1.api_screen
 
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
-import okhttp3.Response
-import org.intellij.lang.annotations.Pattern
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path

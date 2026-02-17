@@ -1,4 +1,4 @@
-package com.example.exercise1
+package com.example.exercise1.api_screen
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -32,7 +33,7 @@ interface TeamApiService {
     // ตัวอย่าง: @Headers("Authorization: 12345abcde-api-key-...")
     @Headers("Authorization: API_SECRET")
     @GET("teams")
-    suspend fun getAllTeams(): retrofit2.Response<TeamResponse>
+    suspend fun getAllTeams(): Response<TeamResponse>
 }
 
 // --- 3. Retrofit Instance ---

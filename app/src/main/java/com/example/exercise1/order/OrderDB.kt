@@ -1,4 +1,4 @@
-package com.example.exercise1
+package com.example.exercise1.order
 
 import android.content.Context
 import androidx.compose.runtime.getValue

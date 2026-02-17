@@ -1,10 +1,7 @@
-package com.example.exercise1
+package com.example.exercise1.history
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,12 +35,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.exercise1.R
+import com.example.exercise1.order.OrderViewModel
+import com.example.exercise1.order.SharedViewModel
 
 @Composable
 fun EditScreen(drinkID:Int,
                navController: NavController,
                sharedViewModel: SharedViewModel,
-               viewModel: OrderViewModel){
+               viewModel: OrderViewModel
+){
     val radioOptions = listOf("S", "M", "L")
     var selectedOption by remember { mutableStateOf(radioOptions[0]) }
     var detailbox by remember { mutableStateOf("") }
