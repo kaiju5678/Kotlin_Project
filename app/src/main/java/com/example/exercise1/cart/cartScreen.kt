@@ -36,105 +36,97 @@ import androidx.compose.material.icons.filled.ArrowBack
 // ส่วนที่ 1: หน้าเลือกซื้อสินค้า (มาแทน AllProductsScreen อันเก่า)
 // ==========================================
 @Composable
-fun NewShoppingScreen(navController: NavController) {
+fun NewShoppingScreen(onCartClick: () -> Unit) {
     val context = LocalContext.current
 
-    // 1. ประกาศ ViewModel สำหรับดึงสินค้า (API)
+    // 1. ประกาศ ViewModel
     val productViewModel: ProductViewModel = viewModel(
         factory = ProductViewModelFactory(ProductRepository())
     )
-
-    // 2. ประกาศ ViewModel สำหรับตะกร้า (Database)
     val cartViewModel: CartViewModel = viewModel(
         factory = CartViewModelFactory(context)
     )
 
-    // สั่งโหลดข้อมูล API เมื่อเข้าหน้านี้
+    // สั่งโหลดข้อมูล
     LaunchedEffect(Unit) {
         productViewModel.loadAllProduct()
     }
 
     val state = productViewModel.allProduct.observeAsState(initial = Resource.Loading())
 
-    // UI หลัก
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("my_cart_page") }, // เดี๋ยวกำหนด route นี้ใน MainActivity
-                containerColor = Color(0xFF6B4A2D)
-            ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = "Go to Cart", tint = Color.White)
+    // 2. ใช้ Box แทน Scaffold
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5)) // ใส่สีพื้นหลังให้ดูดีขึ้น
+    ) {
+        // --- Layer 1: เนื้อหา (Content) ---
+        when (val resource = state.value) {
+            is Resource.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFF6B4A2D))
+                }
             }
-        }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            when (val resource = state.value) {
-                is Resource.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
+            is Resource.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Error: ${resource.message}", color = Color.Red)
                 }
-                is Resource.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Error: ${resource.message}", color = Color.Red)
-                    }
-                }
-                is Resource.Success -> {
-                    val products = resource.data ?: emptyList()
+            }
+            is Resource.Success -> {
+                val products = resource.data ?: emptyList()
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Loop สร้างรายการสินค้า
-                        items(products) { product ->
-                            Card(
-                                elevation = CardDefaults.cardElevation(4.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                modifier = Modifier.fillMaxWidth()
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp), // เว้นขอบซ้ายขวา
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp), // *สำคัญ* เว้นขอบล่างเยอะๆ กันปุ่ม FAB บังสินค้าชิ้นสุดท้าย
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(products) { product ->
+                        Card(
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
+                                // รูปภาพสินค้า
+                                Box(
                                     modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .size(80.dp)
+                                        .background(Color.LightGray, RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    // ส่วนรูปภาพ
-                                    Box(
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .background(Color.LightGray, RoundedCornerShape(8.dp)),
-                                        contentAlignment = Alignment.Center
+                                    AsyncImage(model = product.image, contentDescription = null)
+                                }
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                // รายละเอียดสินค้า
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(product.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
+                                    Text("${product.price} $", color = Color(0xFF6B4A2D))
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    Button(
+                                        onClick = {
+                                            cartViewModel.addToCart(
+                                                id = product.id,
+                                                title = product.title,
+                                                price = product.price,
+                                                category = product.category,
+                                                image = product.image
+                                            )
+                                        },
+                                        modifier = Modifier.height(35.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B4A2D))
                                     ) {
-                                         AsyncImage(model = product.image, contentDescription = null)
-                                    }
-
-                                    Spacer(modifier = Modifier.width(16.dp))
-
-                                    // ส่วนรายละเอียดและปุ่ม
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(product.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
-                                        Text("${product.price} $", color = Color(0xFF6B4A2D))
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                        Button(
-                                            onClick = {
-                                                cartViewModel.addToCart(
-                                                    id = product.id,
-                                                    title = product.title,
-                                                    price = product.price,
-                                                    category = product.category,
-                                                    image = product.image
-                                                )
-                                            },
-                                            modifier = Modifier.height(35.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B4A2D))
-                                        ) {
-                                            Text("Add to Cart", fontSize = 12.sp)
-                                        }
+                                        Text("Add to Cart", fontSize = 12.sp)
                                     }
                                 }
                             }
@@ -142,6 +134,18 @@ fun NewShoppingScreen(navController: NavController) {
                     }
                 }
             }
+        }
+
+        // --- Layer 2: ปุ่มตะกร้า (FAB) ลอยอยู่ข้างบน ---
+        FloatingActionButton(
+            onClick = onCartClick,
+            containerColor = Color(0xFF6B4A2D),
+            contentColor = Color.White,
+            modifier = Modifier
+                .align(Alignment.BottomEnd) // จัดให้อยู่มุมขวาล่าง
+                .padding(16.dp) // เว้นระยะจากขอบจอ
+        ) {
+            Icon(Icons.Default.ShoppingCart, contentDescription = "Go to Cart")
         }
     }
 }

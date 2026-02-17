@@ -64,6 +64,8 @@ import com.example.exercise1.order.OrderViewModel
 import com.example.exercise1.order.OrderViewModelFactory
 import com.example.exercise1.order.SharedViewModel
 import com.example.exercise1.ui.theme.Exercise1Theme
+import com.example.exercise1.cart.NewShoppingScreen
+import com.example.exercise1.cart.MyCartPage
 
 
 class MainActivity : ComponentActivity() {
@@ -184,12 +186,14 @@ class MainActivity : ComponentActivity() {
                         }
                         // 1. เพิ่ม Route สำหรับหน้าเลือกซื้อสินค้า (อันใหม่ที่เราเพิ่งสร้าง)
                         composable("new_shop") {
-                            com.example.exercise1.cart.NewShoppingScreen(navController)
+                            NewShoppingScreen(onCartClick = {
+                                navController.navigate("my_cart_page") // สั่งเปลี่ยนหน้าตรงนี้แทน
+                            })
                         }
 
                         // 2. เพิ่ม Route สำหรับหน้าตะกร้า
                         composable("my_cart_page") {
-                            com.example.exercise1.cart.MyCartPage(navController)
+                            MyCartPage(navController)
                         }
                     }
                 }
