@@ -19,10 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.example.exercise1.order.OrderEntity
-import com.example.exercise1.order.OrderViewModel
+import com.example.exercise1.order.OrderViewModel2
 
 @Composable
-fun Historypage(viewModel: OrderViewModel, navController: NavController ){
+fun Historypage(viewModel: OrderViewModel2, navController: NavController ){
     val order by viewModel.drinks.collectAsState(initial = emptyList())
 
     var deleteOrder by remember { mutableStateOf<OrderEntity?>(null) }

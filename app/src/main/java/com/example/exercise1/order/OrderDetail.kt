@@ -24,7 +24,7 @@ import com.example.exercise1.R
 @Composable
 fun OrderDetail(
     sharedViewModel: SharedViewModel,
-    orderViewModel: OrderViewModel ,
+    orderViewModel: OrderViewModel2 ,
     navController: NavController,
 ) {
     Column(

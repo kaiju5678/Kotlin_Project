@@ -102,7 +102,7 @@ class SharedViewModel : ViewModel() {
     }
 }
 
-class OrderViewModel(
+class OrderViewModel2(
     private val repository: OrderRepository): ViewModel() {
     fun insertOrder(size: String, num: Int, note: String?){
         viewModelScope.launch {
@@ -141,8 +141,8 @@ class OrderViewModelFactory(context: Context): ViewModelProvider.Factory{
     private val repository = OrderRepository(dao)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(OrderViewModel::class.java)){
-            return OrderViewModel(repository) as T
+        if(modelClass.isAssignableFrom(OrderViewModel2::class.java)){
+            return OrderViewModel2(repository) as T
         }
         throw IllegalArgumentException("I don't know this ViewModel Class")
     }

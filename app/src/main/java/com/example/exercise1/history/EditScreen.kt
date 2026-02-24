@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.exercise1.R
-import com.example.exercise1.order.OrderViewModel
+import com.example.exercise1.order.OrderViewModel2
 import com.example.exercise1.order.SharedViewModel
 
 @Composable
 fun EditScreen(drinkID:Int,
                navController: NavController,
                sharedViewModel: SharedViewModel,
-               viewModel: OrderViewModel
+               viewModel: OrderViewModel2
 ){
     val radioOptions = listOf("S", "M", "L")
     var selectedOption by remember { mutableStateOf(radioOptions[0]) }
