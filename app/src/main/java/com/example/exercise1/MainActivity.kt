@@ -39,6 +39,10 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.exercise1.auth.LoginScreen
+import com.example.exercise1.auth.RegisterScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.exercise1.auth.AuthViewModel
 import com.example.exercise1.history.HistoryScreen
 import com.example.exercise1.order.EditOrderScreen
 import com.example.exercise1.order.OrderScreen
@@ -65,6 +69,8 @@ fun LayoutScreen(modifier: Modifier = Modifier) {
     val iconsmenu = listOf(Icons.Default.Home, Icons.Default.History)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val authViewModel: AuthViewModel = viewModel()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -123,7 +129,7 @@ fun LayoutScreen(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "login",
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") { HomeScreen() }
@@ -139,6 +145,28 @@ fun LayoutScreen(modifier: Modifier = Modifier) {
                 arguments = listOf(navArgument("orderid") { type = NavType.StringType })) {
                     stackEntry -> val orderid = stackEntry.arguments?.getString("orderid") ?: ""
                 EditOrderScreen(orderID = orderid, onBack = { navController.popBackStack() } )
+            }
+            composable("login") {
+                LoginScreen(
+                    authViewModel = authViewModel, // --- 2. ส่งค่า authViewModel เข้าไป ---
+                    onLoginSuccess = {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    },
+                    onNavigateToRegister = { navController.navigate("register") }
+                )
+            }
+            composable("register") {
+                RegisterScreen(
+                    authViewModel = authViewModel, // --- 3. ส่งค่า authViewModel เข้าไปตรงนี้ด้วย (ถ้าใน RegisterScreen เรียกหา) ---
+                    onRegisterSuccess = {
+                        navController.navigate("login") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = { navController.popBackStack() }
+                )
             }
         }
     }
